@@ -9,16 +9,16 @@ def get_deque(length=1024):
 
 
 # Helper function for canvas setup
-def trackbar_callback(x):
-    print("Trackbar created with value:", x)
+def trackbar_callback(value):
+    print("Trackbar created with value:", value)
 
 
-# Show the image
+# Show the given frame
 def show_frame(window_name, frame):
     cv2.imshow(window_name, frame)
 
 
-# Create named windows
+# Create named windows for showing the canvas, mask and original frame
 def create_windows(names, size, positions):
     for idx, name in enumerate(names):
         cv2.namedWindow(name, cv2.WINDOW_AUTOSIZE)
@@ -27,51 +27,69 @@ def create_windows(names, size, positions):
 
 
 # Set up the color detection trackbar
-def setup_trackbar(window_name):
-    # Red
-    # cv2.createTrackbar("Max Hue", window_name, 180, 180, trackbar_callback)
-    # cv2.createTrackbar("Max Saturation", window_name, 255, 255, trackbar_callback)
-    # cv2.createTrackbar("Max Value", window_name, 255, 255, trackbar_callback)
-    # cv2.createTrackbar("Min Hue", window_name, 170, 180, trackbar_callback)
-    # cv2.createTrackbar("Min Saturation", window_name, 100, 255, trackbar_callback)
-    # cv2.createTrackbar("Min Value", window_name, 50, 255, trackbar_callback)
+# Predefined colors are red, yellow and blue
+# Reference: https://docs.opencv.org/3.4/da/d6a/tutorial_trackbar.html
+def setup_trackbar(window_name, target_color='blue'):
+    if target_color == 'red':
+        # Set min target values
+        cv2.createTrackbar("Min Hue", window_name, 170, 180, trackbar_callback)
+        cv2.createTrackbar("Min Saturation", window_name, 100, 255, trackbar_callback)
+        cv2.createTrackbar("Min Value", window_name, 50, 255, trackbar_callback)
 
-    # Yellow
-    # cv2.createTrackbar("Max Hue", window_name, 30, 180, trackbar_callback)
-    # cv2.createTrackbar("Max Saturation", window_name, 255, 255, trackbar_callback)
-    # cv2.createTrackbar("Max Value", window_name, 255, 255, trackbar_callback)
-    # cv2.createTrackbar("Min Hue", window_name, 20, 180, trackbar_callback)
-    # cv2.createTrackbar("Min Saturation", window_name, 75, 255, trackbar_callback)
-    # cv2.createTrackbar("Min Value", window_name, 75, 255, trackbar_callback)
+        # Set max target values
+        cv2.createTrackbar("Max Hue", window_name, 180, 180, trackbar_callback)
+        cv2.createTrackbar("Max Saturation", window_name, 255, 255, trackbar_callback)
+        cv2.createTrackbar("Max Value", window_name, 255, 255, trackbar_callback)
 
-    # Blue
-    cv2.createTrackbar("Max Hue", window_name, 130, 180, trackbar_callback)
-    cv2.createTrackbar("Max Saturation", window_name, 255, 255, trackbar_callback)
-    cv2.createTrackbar("Max Value", window_name, 255, 255, trackbar_callback)
-    cv2.createTrackbar("Min Hue", window_name, 110, 180, trackbar_callback)
-    cv2.createTrackbar("Min Saturation", window_name, 80, 255, trackbar_callback)
-    cv2.createTrackbar("Min Value", window_name, 80, 255, trackbar_callback)
+    elif target_color == 'yellow':
+        # Set min target values
+        cv2.createTrackbar("Min Hue", window_name, 20, 180, trackbar_callback)
+        cv2.createTrackbar("Min Saturation", window_name, 75, 255, trackbar_callback)
+        cv2.createTrackbar("Min Value", window_name, 75, 255, trackbar_callback)
+
+        # Set max target values
+        cv2.createTrackbar("Max Hue", window_name, 30, 180, trackbar_callback)
+        cv2.createTrackbar("Max Saturation", window_name, 255, 255, trackbar_callback)
+        cv2.createTrackbar("Max Value", window_name, 255, 255, trackbar_callback)
+
+    elif target_color == 'blue':
+        # Set min target values
+        cv2.createTrackbar("Min Hue", window_name, 110, 180, trackbar_callback)
+        cv2.createTrackbar("Min Saturation", window_name, 80, 255, trackbar_callback)
+        cv2.createTrackbar("Min Value", window_name, 80, 255, trackbar_callback)
+
+        # Set max target values
+        cv2.createTrackbar("Max Hue", window_name, 130, 180, trackbar_callback)
+        cv2.createTrackbar("Max Saturation", window_name, 255, 255, trackbar_callback)
+        cv2.createTrackbar("Max Value", window_name, 255, 255, trackbar_callback)
 
 
-# Set up the canvas and return it along with kernel
+# Given an image frame, it sets up the action menu buttons
+# And returns the updated frame with the menu items on it
+# Reference: https://docs.opencv.org/4.x/dc/da5/tutorial_py_drawing_functions.html
 def setup_color_buttons(data, color_list, texts, show_text=False):
     white_color = (255, 255, 255)
 
+    # Set up the first element
     data = cv2.rectangle(data, (25, 0), (135, 60), color_list[0], 1)
     cv2.putText(data, texts[0], (40, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color_list[0], 2, cv2.LINE_AA)
 
+    # Set up the second element
     data = cv2.rectangle(data, (145, 0), (255, 60), color_list[1], -1)
     if show_text:
         cv2.putText(data, texts[1], (160, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, white_color, 2, cv2.LINE_AA)
 
+    # Set up the third element
     data = cv2.rectangle(data, (265, 0), (375, 60), color_list[2], -1)
     if show_text:
         cv2.putText(data, texts[2], (280, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, white_color, 2, cv2.LINE_AA)
 
+    # Set up the forth element
     data = cv2.rectangle(data, (385, 0), (495, 60), color_list[3], -1)
     if show_text:
         cv2.putText(data, texts[3], (400, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, white_color, 2, cv2.LINE_AA)
 
+    # Set up the fifth element
     data = cv2.rectangle(data, (505, 0), (615, 60), color_list[4], -1)
     if show_text:
         cv2.putText(data, texts[4], (520, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, white_color, 2, cv2.LINE_AA)
@@ -82,13 +100,19 @@ def setup_color_buttons(data, color_list, texts, show_text=False):
 # Given the camera, captures the next frame and
 # returns original frame, flipped frame and hsv frame
 def get_frame(cam, resize_ratio=2):
-    ret, frame = cam.read()
-    h, w, c = frame.shape
-    frame = cv2.resize(frame, (w//resize_ratio, h//resize_ratio), interpolation=cv2.INTER_AREA)
-    flipped_frame = cv2.flip(frame, 1)
-    hsv_frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2HSV)
+    # Capture the frame from camera
+    _, frame = cam.read()
+    h, w, channel = frame.shape
 
-    return frame, flipped_frame, hsv_frame, ret
+    # Resize the frame
+    frame = cv2.resize(frame, (w//resize_ratio, h//resize_ratio), interpolation=cv2.INTER_AREA)
+
+    # Flip the frame and convert to HSV
+    frame_flipped = cv2.flip(frame, 1)
+    frame_hsv = cv2.cvtColor(frame_flipped, cv2.COLOR_BGR2HSV)
+
+    # Return data
+    return frame, frame_flipped, frame_hsv
 
 
 # Get the upper and lower HSVs
@@ -99,14 +123,22 @@ def get_target_hsv(window_name):
 
 
 # Get the detection mask and contour of the object/pen
+# Reference: https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
 def get_mask_and_contour(frame, max_hsv, min_hsv):
+    # Creating Mask in HSV color space
     # show_frame("HSV", frame)
     hsv_mask = cv2.inRange(frame, min_hsv, max_hsv)
     # show_frame("Mask", mask)
+
+    # Apply an Erode operation
     hsv_mask = cv2.erode(hsv_mask, kernel, iterations=1)
     # show_frame("Erode", mask)
+
+    # Apply a Morphological Open operation
     hsv_mask = cv2.morphologyEx(hsv_mask, cv2.MORPH_OPEN, kernel)
     # show_frame("MorphEx", mask)
+
+    # Apply a Dilate operation
     hsv_mask = cv2.dilate(hsv_mask, kernel, iterations=1)
     # show_frame("Dilate", mask)
 
@@ -114,6 +146,37 @@ def get_mask_and_contour(frame, max_hsv, min_hsv):
     contur, _ = cv2.findContours(hsv_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     return hsv_mask, contur
+
+
+# Draw on the canvas based on the marker position
+# And selected color
+def draw_over_canvas():
+    for idx in range(len(rgbp_points)):
+        for j in range(len(rgbp_points[idx])):
+            for k in range(1, len(rgbp_points[idx][j])):
+                if rgbp_points[idx][j][k - 1] is not None and rgbp_points[idx][j][k] is not None:
+                    cv2.line(flipped_frame, rgbp_points[idx][j][k - 1], rgbp_points[idx][j][k], colors[idx+1], 2)
+                    cv2.line(canvas, rgbp_points[idx][j][k - 1], rgbp_points[idx][j][k], colors[idx+1], 2)
+
+
+# Clear the canvas and reset the color points
+# Return the updated values
+def reset_canvas(active_canvas):
+    # Clear the canvas, keep the top selectors
+    active_canvas[61:, :, :] = 255
+
+    # Reset all the values
+    color_points = [
+        [get_deque()],          # For red
+        [get_deque()],          # For green
+        [get_deque()],          # For blue
+        [get_deque()],          # For purple
+    ]
+    color_indices = [0, 0, 0, 0]
+    selected_color_idx = 1
+
+    # Return the updated values
+    return canvas, color_points, color_indices, selected_color_idx
 
 
 # Required parameters
@@ -130,39 +193,42 @@ selected_color = 1
 canvas = np.ones((window_size[1], window_size[0], 3), np.uint8) * 255
 kernel = np.ones((5, 5), np.uint8)
 
-# Set the canvas up and windows
-create_windows(window_names, window_size, window_positions)
-setup_trackbar(color_detector)
-canvas = setup_color_buttons(canvas, colors, color_names, show_text=True)
-
 # Points for drawing the line with their count of elements
-red_points = [get_deque()]
-red_count = 0
-green_points = [get_deque()]
-green_count = 0
-blue_points = [get_deque()]
-blue_count = 0
-purple_points = [get_deque()]
-purple_count = 0
+rgbp_points = [
+    [get_deque()],          # For red
+    [get_deque()],          # For green
+    [get_deque()],          # For blue
+    [get_deque()],          # For purple
+]
+rgbp_counts = [0, 0, 0, 0]
 
 # Start the default camera
+# Reference: https://docs.opencv.org/3.4/dd/d43/tutorial_py_video_display.html
 camera = cv2.VideoCapture(0)
-width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
-height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+if not camera.isOpened():
+    print("Cannot open camera")
+    exit()
 
 # Print the screen resolution
+width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 print("Screen resolution: {}x{}".format(int(width), int(height)))
+
+# Set the canvas up and windows
+create_windows(window_names, window_size, window_positions)
+canvas = setup_color_buttons(canvas, colors, color_names, show_text=True)
+setup_trackbar(color_detector)
 
 # Continue capturing frames and doing things
 while True:
     # Get the required frames
-    main_frame, flipped_frame, hsv_frame, ret = get_frame(camera, resize_ratio=2)
-
-    # Get the upper and lower HSV values of target color
-    u_hsv, l_hsv = get_target_hsv(color_detector)
+    main_frame, flipped_frame, hsv_frame = get_frame(camera, resize_ratio=2)
 
     # Put color selection options over the frames
     flipped_frame = setup_color_buttons(flipped_frame, colors, color_names, show_text=True)
+
+    # Get the upper and lower HSV values of target color
+    u_hsv, l_hsv = get_target_hsv(color_detector)
 
     # Detect the object/pen
     mask, contour = get_mask_and_contour(hsv_frame, u_hsv, l_hsv)
@@ -172,16 +238,22 @@ while True:
     # And follow as per selection
     if has_contour:
         # Find the biggest contour
-        c = sorted(contour, key=cv2.contourArea, reverse=True)[0]
-        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        contour_points_sorted = sorted(contour, key=cv2.contourArea, reverse=True)[0]
+        ((x, y), radius) = cv2.minEnclosingCircle(contour_points_sorted)
+
+        # Find the center of the contour
+        moments = cv2.moments(contour_points_sorted)
+        center = (int(moments['m10'] / moments['m00']), int(moments['m01'] / moments['m00']))
 
         # Draw the circle showing the contour
         cv2.circle(flipped_frame, (int(x), int(y)), int(radius), (255, 0, 127), 2)
-        moments = cv2.moments(c)
-        center = (int(moments['m10'] / moments['m00']), int(moments['m01'] / moments['m00']))
 
         # If we are over the color selecting boxes
-        if center[1] <= 60:
+        if center[1] > 60:
+            # Draw over the canvas
+            rgbp_points[selected_color-1][rgbp_counts[selected_color-1]].appendleft(center)
+        else:
+            # Menu Selected, perform operation accordingly
             if 145 <= center[0] <= 255:
                 # Red selected
                 selected_color = 1
@@ -196,54 +268,23 @@ while True:
                 selected_color = 4
             # We are over the clear menu
             elif 25 <= center[0] <= 135:
-                # Clear the canvas, keep the top selectors
-                canvas[61:, :, :] = 255
+                # Reset the canvas and color points
+                canvas, rgbp_points, rgbp_counts, selected_color = reset_canvas(canvas)
 
-                # Reset all the values
-                red_points = [get_deque()]
-                red_count = 0
-                green_points = [get_deque()]
-                green_count = 0
-                blue_points = [get_deque()]
-                blue_count = 0
-                purple_points = [get_deque()]
-                purple_count = 0
-        else:
-            # Else, draw over the canvas
-            if selected_color == 1:
-                red_points[red_count].appendleft(center)
-            elif selected_color == 2:
-                green_points[green_count].appendleft(center)
-            elif selected_color == 3:
-                blue_points[blue_count].appendleft(center)
-            elif selected_color == 4:
-                purple_points[purple_count].appendleft(center)
-
-    # If nothing detected, push empty deque
+    # If nothing detected
     else:
-        red_points.append(get_deque())
-        red_count += 1
-        green_points.append(get_deque())
-        green_count += 1
-        blue_points.append(get_deque())
-        blue_count += 1
-        purple_points.append(get_deque())
-        purple_count += 1
+        # Push empty deque and increment count to maintain consistency
+        for i in range(4):
+            rgbp_points[i].append(get_deque())
+            rgbp_counts[i] += 1
 
     # Draw over the canvas and frame
-    points = [red_points, green_points, blue_points, purple_points]
-    for i in range(len(points)):
-        for j in range(len(points[i])):
-            for k in range(1, len(points[i][j])):
-                if points[i][j][k - 1] is None or points[i][j][k] is None:
-                    continue
-                cv2.line(flipped_frame, points[i][j][k - 1], points[i][j][k], colors[i+1], 2)
-                cv2.line(canvas, points[i][j][k - 1], points[i][j][k], colors[i+1], 2)
+    draw_over_canvas()
 
     # Show all the windows
+    cv2.imshow(canvas_window, canvas)
     cv2.imshow(mask_window, mask)
     cv2.imshow(pen_tracking_window, flipped_frame)
-    cv2.imshow(canvas_window, canvas)
 
     # Stop and break the loop if the 'q' key is pressed
     if cv2.waitKey(1) & 0xFF == ord("q"):

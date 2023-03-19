@@ -1,16 +1,10 @@
 import cv2
 import numpy as np
-from collections import deque
 
 
 # -------------------------------------------------------------------------------- #
 # ------------------------ Helper Utility Functions ------------------------------ #
 # -------------------------------------------------------------------------------- #
-
-# Get new Deque
-def get_deque(length=1024):
-    return deque(maxlen=length)
-
 
 # Helper function for canvas setup
 def trackbar_callback(value):
@@ -149,18 +143,24 @@ def get_mask_and_contour(frame, max_hsv, min_hsv):
     # Find the contours for the object/pen
     contur, _ = cv2.findContours(hsv_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    return hsv_mask, contur
+    return hsv_mask, contur, len(contur) > 0
 
 
 # Draw on the canvas based on the marker position
 # And selected color
-def draw_over_canvas():
+def draw_over_canvas_and_show(canvas_win, latest_canvas, mask_win, msk, pen_tracking_win, flip_frame):
+    # Draw over the canvas
     for idx in range(len(rgbp_points)):
         for j in range(len(rgbp_points[idx])):
             for k in range(1, len(rgbp_points[idx][j])):
                 if rgbp_points[idx][j][k - 1] is not None and rgbp_points[idx][j][k] is not None:
                     cv2.line(flipped_frame, rgbp_points[idx][j][k - 1], rgbp_points[idx][j][k], colors[idx+1], 2)
-                    cv2.line(canvas, rgbp_points[idx][j][k - 1], rgbp_points[idx][j][k], colors[idx+1], 2)
+                    cv2.line(latest_canvas, rgbp_points[idx][j][k - 1], rgbp_points[idx][j][k], colors[idx + 1], 2)
+
+    # Show all the windows
+    cv2.imshow(canvas_win, latest_canvas)
+    cv2.imshow(mask_win, msk)
+    cv2.imshow(pen_tracking_win, flip_frame)
 
 
 # Clear the canvas and reset the color points
@@ -171,10 +171,10 @@ def reset_canvas(active_canvas):
 
     # Reset all the values
     color_points = [
-        [get_deque()],          # For red
-        [get_deque()],          # For green
-        [get_deque()],          # For blue
-        [get_deque()],          # For purple
+        [list()],          # For red
+        [list()],          # For green
+        [list()],          # For blue
+        [list()],          # For purple
     ]
     color_indices = [0, 0, 0, 0]
     selected_color_idx = 1
@@ -203,10 +203,10 @@ kernel = np.ones((5, 5), np.uint8)
 
 # Points for drawing the line with their count of elements
 rgbp_points = [
-    [get_deque()],          # For red
-    [get_deque()],          # For green
-    [get_deque()],          # For blue
-    [get_deque()],          # For purple
+    [list()],          # For red
+    [list()],          # For green
+    [list()],          # For blue
+    [list()],          # For purple
 ]
 rgbp_counts = [0, 0, 0, 0]
 
@@ -244,8 +244,7 @@ while True:
     u_hsv, l_hsv = get_target_hsv(color_detector)
 
     # Detect the object/pen
-    mask, contour = get_mask_and_contour(hsv_frame, u_hsv, l_hsv)
-    has_contour = len(contour) > 0
+    mask, contour, has_contour = get_mask_and_contour(hsv_frame, u_hsv, l_hsv)
 
     # Draw the contour if it has one
     # And follow as per selection
@@ -261,10 +260,10 @@ while True:
         # Draw the circle showing the contour
         cv2.circle(flipped_frame, (int(x), int(y)), int(radius), (255, 0, 127), 2)
 
-        # If we are over the color selecting boxes
+        # If we are outside the color selecting boxes (over the active canvas area)
         if center[1] > 60:
-            # Draw over the canvas
-            rgbp_points[selected_color-1][rgbp_counts[selected_color-1]].appendleft(center)
+            # Draw over the canvas (save the center of the marker contour)
+            rgbp_points[selected_color-1][rgbp_counts[selected_color-1]].insert(0, center)
         else:
             # Menu Selected, perform operation accordingly
             if 145 <= center[0] <= 255:
@@ -286,18 +285,13 @@ while True:
 
     # If nothing detected
     else:
-        # Push empty deque and increment count to maintain consistency
+        # Push empty list and increment count to maintain consistency
         for i in range(4):
-            rgbp_points[i].append(get_deque())
+            rgbp_points[i].append(list())
             rgbp_counts[i] += 1
 
     # Draw over the canvas and frame
-    draw_over_canvas()
-
-    # Show all the windows
-    cv2.imshow(canvas_window, canvas)
-    cv2.imshow(mask_window, mask)
-    cv2.imshow(pen_tracking_window, flipped_frame)
+    draw_over_canvas_and_show(canvas_window, canvas, mask_window, mask, pen_tracking_window, flipped_frame)
 
     # Stop and break the loop if the 'q' key is pressed
     if cv2.waitKey(1) & 0xFF == ord("q"):

@@ -3,6 +3,10 @@ import numpy as np
 from collections import deque
 
 
+# -------------------------------------------------------------------------------- #
+# ------------------------ Helper Utility Functions ------------------------------ #
+# -------------------------------------------------------------------------------- #
+
 # Get new Deque
 def get_deque(length=1024):
     return deque(maxlen=length)
@@ -179,6 +183,10 @@ def reset_canvas(active_canvas):
     return canvas, color_points, color_indices, selected_color_idx
 
 
+# -------------------------------------------------------------------------------- #
+# ------------------------ All Required Parameters ------------------------------- #
+# -------------------------------------------------------------------------------- #
+
 # Required parameters
 pen_tracking_window = "Pen Tracker"
 mask_window = "Mask"
@@ -201,6 +209,11 @@ rgbp_points = [
     [get_deque()],          # For purple
 ]
 rgbp_counts = [0, 0, 0, 0]
+
+
+# -------------------------------------------------------------------------------- #
+# -------------------------- Main Implementation --------------------------------- #
+# -------------------------------------------------------------------------------- #
 
 # Start the default camera
 # Reference: https://docs.opencv.org/3.4/dd/d43/tutorial_py_video_display.html
@@ -293,3 +306,7 @@ while True:
 # Release all resources
 camera.release()
 cv2.destroyAllWindows()
+
+# -------------------------------------------------------------------------------- #
+# --------------------------------- The End -------------------------------------- #
+# -------------------------------------------------------------------------------- #
